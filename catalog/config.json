@@ -1,0 +1,17 @@
+{
+  "tagline": "Visualization for the OpenStack environment",
+  "repository": "https://github.com/newrelic/nr1-openstack.git",
+  "details": "[]",
+  "support": {
+    "issues": {
+      "url": "https://github.com/newrelic/nr1-openstack/issues"
+    },
+    "email": {
+      "address": "opensource+nr1-openstack@newrelic.com"
+    },
+    "community": {
+      "url": "https://discuss.newrelic.com/t/nr1-openstack"
+    }
+  },
+  "whatsNew": "\n-Feat: POC ready"
+}

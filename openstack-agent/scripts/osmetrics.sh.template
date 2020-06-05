@@ -1,0 +1,43 @@
+#!/bin/bash
+
+function usage() {
+  echo -e "\n\tusage: $0   [ block_storage | hypervisors | servers | networks | limits | resource_providers ]"
+  echo -e "\tprocesses Openstack telemetry and pushes metrics to New Relic Insights\n\n\n"
+  exit 1
+}
+
+# change the value of NR_AGENT_DIR env var (next line) to the absolute path of NR Openstack agent home installation directory
+NR_AGENT_DIR="_ABSOLUTE_PATH_TO_NR_AGENT_HOME_DIR_"
+
+[ -z "$1" ] && {
+  usage
+}
+
+name=${1}
+if [[ ":hypervisors:-:servers:-:networks:-:limits:-:block_storage:-:resource_providers:-:images:-:keystone:-:nova:" != *":${name}:"* ]]; then
+  usage
+fi
+
+
+DATA_FOUND=0
+for file in ${NR_AGENT_DIR}/data/${name}/${name}_*.json
+do
+  if [ -s "${file}" ]; then
+    DATA_FOUND=1
+    break
+  fi
+done
+
+if [ $DATA_FOUND != 1 ]; then
+    # echo "no data available for ${name} in this cycle"
+    exit 0
+fi
+
+# cat ${NR_AGENT_DIR}/data/${name}/${name}_*.json | jq -s "."
+echo "[ $(cat ${NR_AGENT_DIR}/data/${name}/${name}_*.json | grep "^{" | sed 's/}$/},/' | tr -d '\n' | sed 's/,$//') ]"
+[ $? == 0 ] && {
+  # echo "${name} - batch processed"
+  ### mkdir -p ${NR_AGENT_DIR}/data/backup/${name} > /dev/null 2>/dev/null
+  ### mv -f ${NR_AGENT_DIR}/data/${name}/${name}*.json ${NR_AGENT_DIR}/data/backup/${name}/
+  rm -f ${NR_AGENT_DIR}/data/${name}/${name}*.json
+}

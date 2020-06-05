@@ -1,0 +1,77 @@
+integrations:
+  - name: nri-flex
+    exec: /var/db/newrelic-infra/newrelic-integrations/bin/nri-flex-c8b27714-2
+    inventory_source: metadata/system
+    interval: 60s
+    config:
+      name: OpenStack
+      variable_store:
+        authUrl: __KEYSTONE_URL__
+        userDomainID: __USER_DOMAIN_ID__
+        username: __ADMIN_USER_NAME__
+        password: __ADMIN_PASSWORD__
+        authString: --os-auth-url=${var:authUrl} --os-username=${var:username} --os-password=${var:password} --os-user-domain-id=${var:userDomainID}
+      apis:
+        - name: OpenStackProjectLookup
+          commands:
+            - run: openstack project list -f json ${var:authString}
+          ignore_output: true
+        - name: OpenStackHypervisorLookup
+          commands:
+            - run: openstack hypervisor list -f json ${var:authString} --os-project-id=${lookup.OpenStackProjectLookupSample:ID}
+          custom_attributes:
+            projectID: ${lookup.OpenStackProjectLookupSample:ID}
+            projectName: ${lookup.OpenStackProjectLookupSample:Name}
+          ignore_output: true
+        - name: OpenStackServerList
+          run_async: true
+          commands:
+            - run: openstack server list -f json ${var:authString} --os-project-id=${lookup.OpenStackHypervisorLookupSample:projectID} --host=${lookup.OpenStackHypervisorLookupSample:Hypervisor Hostname}
+          custom_attributes:
+            hypervisorHostname: ${lookup.OpenStackHypervisorLookupSample:Hypervisor Hostname}
+            hypervisorID: ${lookup.OpenStackHypervisorLookupSample:ID}
+            projectID: ${lookup.OpenStackHypervisorLookupSample:projectID}
+            projectName: ${lookup.OpenStackHypervisorLookupSample:projectName}
+          ignore_output: true
+        ### Servers   -----------------------------------------------------
+        - name: System
+          run_async: true
+          entity: ${lookup.OpenStackServerListSample:hypervisorHostname}:${lookup.OpenStackServerListSample:hypervisorID}:${lookup.OpenStackServerListSample:Name}
+          commands:
+            - run: openstack server show --diagnostics ${lookup.OpenStackServerListSample:ID} -f json ${var:authString} --os-project-id=${lookup.OpenStackServerListSample:projectID}
+          custom_attributes:
+            domainID: ${var:userDomainID}
+            hypervisorHostname: ${lookup.OpenStackServerListSample:hypervisorHostname}
+            hypervisorID: ${lookup.OpenStackServerListSample:hypervisorID}
+            projectID: ${lookup.OpenStackServerListSample:projectID}
+            projectName: ${lookup.OpenStackServerListSample:projectName}
+            serverID: ${lookup.OpenStackServerListSample:ID}
+            Flavor: ${lookup.OpenStackServerListSample:Flavor}
+            Image: ${lookup.OpenStackServerListSample:Image}
+            Name: ${lookup.OpenStackServerListSample:Name}
+            Networks: ${lookup.OpenStackServerListSample:Networks}
+            Status: ${lookup.OpenStackServerListSample:Status}
+          rename_keys:
+            \S+_rx: rx
+            \S+_tx: tx
+          inventory:
+            serverID: name
+        ### Hypervisors -----------------------------------------------------
+        - name: System
+          run_async: true
+          entity: ${lookup.OpenStackHypervisorLookupSample:Hypervisor Hostname}:${lookup.OpenStackHypervisorLookupSample:ID}
+          commands:
+            - run: openstack hypervisor show ${lookup.OpenStackHypervisorLookupSample:ID} -f json ${var:authString} --os-project-id=${lookup.OpenStackHypervisorLookupSample:projectID}
+          remove_keys:
+            - cpu_info
+          custom_attributes:
+            domainID: ${var:userDomainID}
+          dedupe_lookups:
+            - ID
+          inventory:
+            id: name
+          # pluck_numbers: true
+          value_mapper:
+            load_average:
+              - (.+), (.+), (.+)=>$1
+

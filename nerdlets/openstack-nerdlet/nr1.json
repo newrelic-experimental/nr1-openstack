@@ -1,0 +1,6 @@
+{
+    "schemaType": "NERDLET",
+    "id": "openstack-nerdlet",
+    "displayName": "OpenStack",
+    "description": "OpenStack dashbaord"
+}

@@ -1,0 +1,203 @@
+{
+  "dashboard": {
+    "id": 1143097,
+    "title": "OpenStack Networks",
+    "description": null,
+    "icon": "bar-chart",
+    "created_at": "2020-03-26T20:26:02Z",
+    "updated_at": "2020-04-04T05:52:32Z",
+    "visibility": "all",
+    "editable": "editable_by_all",
+    "ui_url": "https://insights.newrelic.com/accounts/739516/dashboards/1143097",
+    "api_url": "https://api.newrelic.com/v2/dashboards/1143097",
+    "owner_email": "shahram@newrelic.com",
+    "metadata": {
+      "version": 1
+    },
+    "widgets": [
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 1
+        },
+        "widget_id": 16415753,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.domain.id`) as Domain from OSNetworkSample facet `openstack.domain.id`"
+          }
+        ],
+        "presentation": {
+          "title": "Domains",
+          "notes": null,
+          "drilldown_dashboard_id": 1143097
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 2
+        },
+        "widget_id": 16415755,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.neutron.network.name`) from OSNetworkSample facet  `openstack.neutron.network.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Networks",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 3
+        },
+        "widget_id": 16416784,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.neutron.network.id`) as 'Network Count' from OSNetworkSample"
+          }
+        ],
+        "presentation": {
+          "title": "Number of Networks",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 2,
+          "column": 1
+        },
+        "widget_id": 16594384,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.neutron.network.mtu`) from OSNetworkSample facet `openstack.neutron.network.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Maximum Transmission Units (MTU's)",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "faceted_line_chart",
+        "layout": {
+          "width": 2,
+          "height": 1,
+          "row": 2,
+          "column": 2
+        },
+        "widget_id": 16594385,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.neutron.network.mtu`) as 'MTUs' from OSNetworkSample facet `openstack.neutron.network.name` timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Maximum Transmission Units (MTU's) over Time",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 3,
+          "column": 1
+        },
+        "widget_id": 16594436,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select latest(`openstack.neutron.network.status`) from OSNetworkSample facet `openstack.neutron.network.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Network Status",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 3,
+          "column": 2
+        },
+        "widget_id": 16594438,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "SELECT latest(`openstack.neutron.network.admin_state_up`) as 'Admin State Up' from OSNetworkSample facet `openstack.neutron.network.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Admin State Up",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 3,
+          "column": 3
+        },
+        "widget_id": 16594441,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "SELECT latest(`openstack.neutron.network.created_at`) as 'Created Date/Time' from OSNetworkSample facet `openstack.neutron.network.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Network Creation Time",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      }
+    ],
+    "filter": {
+      "event_types": [
+        "OSServerSample",
+        "OSNetworkSample"
+      ],
+      "attributes": [
+        "openstack.nova.server.project.name",
+        "openstack.nova.server.id",
+        "openstack.nova.server.name",
+        "openstack.nova.server.domain.id",
+        "openstack.domain.id",
+        "openstack.project.name",
+        "openstack.neutron.name",
+        "openstack.neutron.network.name"
+      ]
+    }
+  }
+}

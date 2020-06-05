@@ -1,0 +1,140 @@
+{
+  "dashboard": {
+    "id": 1144050,
+    "title": "OpenStack Project Limits",
+    "description": null,
+    "icon": "bar-chart",
+    "created_at": "2020-03-27T14:01:38Z",
+    "updated_at": "2020-03-27T15:05:29Z",
+    "visibility": "all",
+    "editable": "editable_by_all",
+    "ui_url": "https://insights.newrelic.com/accounts/739516/dashboards/1144050",
+    "api_url": "https://api.newrelic.com/v2/dashboards/1144050",
+    "owner_email": "shahram@newrelic.com",
+    "metadata": {
+      "version": 1
+    },
+    "widgets": [
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 1
+        },
+        "widget_id": 16431657,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.domain.id`) as Domain from OSBlockStorageSample facet `openstack.domain.id`"
+          }
+        ],
+        "presentation": {
+          "title": "Domains",
+          "notes": null,
+          "drilldown_dashboard_id": 1144050
+        }
+      },
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 2
+        },
+        "widget_id": 16431658,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.project.name`) from OSBlockStorageSample, OSLimitSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Projects",
+          "notes": null,
+          "drilldown_dashboard_id": 1144050
+        }
+      },
+      {
+        "visualization": "single_event",
+        "layout": {
+          "width": 1,
+          "height": 3,
+          "row": 1,
+          "column": 3
+        },
+        "widget_id": 16432083,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select `openstack.domain.id` as 'domain id', `openstack.project.name` as 'project name', `openstack.cinder.limits.maxTotalBackupGigabytes` as maxTotalBackupGigabytes, `openstack.cinder.limits.maxTotalBackups`as maxTotalBackups, `openstack.cinder.limits.maxTotalSnapshots` as maxTotalSnapshots, `openstack.cinder.limits.maxTotalVolumeGigabytes` as maxTotalVolumeGigabytes, `openstack.cinder.limits.maxTotalVolumes` as maxTotalVolumes, `openstack.cinder.limits.totalBackupGigabytesUsed` as totalBackupGigabytesUsed, `openstack.cinder.limits.totalBackupsUsed` as totalBackupsUsed, `openstack.cinder.limits.totalGigabytesUsed` as totalGigabytesUsed, `openstack.cinder.limits.totalSnapshotsUsed` as totalSnapshotsUsed, `openstack.cinder.limits.totalVolumesUsed` as totalVolumesUsed, `openstack.cinder.snapshots.count` as 'snapshots count', `openstack.cinder.snapshots.size` as 'snapshots size' from OSBlockStorageSample limit 1"
+          }
+        ],
+        "presentation": {
+          "title": "Block Storage Limits",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "single_event",
+        "layout": {
+          "width": 1,
+          "height": 2,
+          "row": 2,
+          "column": 1
+        },
+        "widget_id": 16432667,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select `openstack.domain.id` as 'domain id', `openstack.project.name` as 'project name', `openstack.nova.limits.maxImageMeta` as maxImageMeta, `openstack.nova.limits.maxPersonality` as maxPersonality, `openstack.nova.limits.maxPersonalitySize` as maxPersonalitySize, `openstack.nova.limits.maxSecurityGroupRules` as maxSecurityGroupRules, `openstack.nova.limits.maxSecurityGroups` as maxSecurityGroups, `openstack.nova.limits.maxServerGroupMembers` as maxServerGroupMembers, `openstack.nova.limits.maxServerGroups` as maxServerGroups, `openstack.nova.limits.maxServerMeta` as maxServerMeta from OSLimitSample limit 1"
+          }
+        ],
+        "presentation": {
+          "title": "Compute Limits",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "single_event",
+        "layout": {
+          "width": 1,
+          "height": 2,
+          "row": 2,
+          "column": 2
+        },
+        "widget_id": 16432735,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select `openstack.domain.id` as 'domain id', `openstack.project.name` as 'project name', `openstack.nova.limits.maxTotalCores` as maxTotalCores, `openstack.nova.limits.maxTotalFloatingIps` as maxTotalFloatingIps, `openstack.nova.limits.maxTotalInstances` as maxTotalInstances, `openstack.nova.limits.maxTotalKeypairs` as maxTotalKeypairs, `openstack.nova.limits.maxTotalRAMSize` as maxTotalRAMSize, `openstack.nova.limits.totalCoresUsed` as totalCoresUsed, `openstack.nova.limits.totalFloatingIpsUsed` as totalFloatingIpsUsed, `openstack.nova.limits.totalInstancesUsed` as totalInstancesUsed, `openstack.nova.limits.totalRAMUsed` as totalRAMUsed, `openstack.nova.limits.totalSecurityGroupsUsed` as totalSecurityGroupsUsed, `openstack.nova.limits.totalServerGroupsUsed` as totalServerGroupsUsed from OSLimitSample limit 1"
+          }
+        ],
+        "presentation": {
+          "title": "Compute Limits (cont.)",
+          "notes": null
+        }
+      }
+    ],
+    "filter": {
+      "event_types": [
+        "OSServerSample",
+        "OSHypervisorSample",
+        "OSBlockStorageSample",
+        "OSLimitSample"
+      ],
+      "attributes": [
+        "openstack.nova.server.project.name",
+        "openstack.nova.server.id",
+        "openstack.nova.server.name",
+        "openstack.nova.server.domain.id",
+        "openstack.nova.hypervisor.host_ip",
+        "openstack.domain.id",
+        "openstack.nova.hypervisor.hypervisor_hostname",
+        "openstack.project.name"
+      ]
+    }
+  }
+}

@@ -1,0 +1,221 @@
+{
+  "dashboard": {
+    "id": 1141293,
+    "title": "OpenStack Servers",
+    "description": null,
+    "icon": "bar-chart",
+    "created_at": "2020-03-25T16:50:20Z",
+    "updated_at": "2020-04-04T05:57:47Z",
+    "visibility": "all",
+    "editable": "editable_by_owner",
+    "ui_url": "https://insights.newrelic.com/accounts/739516/dashboards/1141293",
+    "api_url": "https://api.newrelic.com/v2/dashboards/1141293",
+    "owner_email": "shahram@newrelic.com",
+    "metadata": {
+      "version": 1
+    },
+    "widgets": [
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 1
+        },
+        "widget_id": 16380149,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.domain.id`) as Domain from OSServerSample facet `openstack.domain.id`"
+          }
+        ],
+        "presentation": {
+          "title": "Domains",
+          "notes": null,
+          "drilldown_dashboard_id": 1141293
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 2
+        },
+        "widget_id": 16379617,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.project.name`) from OSServerSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Projects",
+          "notes": null,
+          "drilldown_dashboard_id": 1141293
+        }
+      },
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 3
+        },
+        "widget_id": 16379796,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.nova.server.id`) from OSServerSample facet  `openstack.nova.server.name`"
+          }
+        ],
+        "presentation": {
+          "title": "servers",
+          "notes": null,
+          "drilldown_dashboard_id": 1141293
+        }
+      },
+      {
+        "visualization": "faceted_line_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 2,
+          "column": 1
+        },
+        "widget_id": 16379805,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.nova.server.rx`) from OSServerSample facet `openstack.nova.server.name` timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Network Packets Received",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "faceted_line_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 2,
+          "column": 2
+        },
+        "widget_id": 16380038,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.nova.server.rx_errors`) from OSServerSample facet `openstack.nova.server.name` timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Network Packets Receive Errors",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "faceted_line_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 2,
+          "column": 3
+        },
+        "widget_id": 16380121,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.nova.server.rx_drop`) from OSServerSample facet `openstack.nova.server.name` timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Network Packet Receive Drops",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "faceted_line_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 3,
+          "column": 1
+        },
+        "widget_id": 16379873,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.nova.server.tx`) from OSServerSample facet `openstack.nova.server.name` timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Network Packets Sent",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "faceted_line_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 3,
+          "column": 2
+        },
+        "widget_id": 16380133,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.nova.server.tx_errors`) from OSServerSample facet `openstack.nova.server.name` timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Network Packets Send Errors",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "faceted_line_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 3,
+          "column": 3
+        },
+        "widget_id": 16380135,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.nova.server.tx_drop`) from OSServerSample facet `openstack.nova.server.name` timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Network Packet Send Drops",
+          "notes": null
+        }
+      }
+    ],
+    "filter": {
+      "event_types": [
+        "OSServerSample",
+        "OSHypervisorSample",
+        "OSLimitSample",
+        "OSNetworkSample",
+        "OSBlockStorageSample"
+      ],
+      "attributes": [
+        "openstack.nova.server.project.name",
+        "openstack.nova.server.id",
+        "openstack.nova.server.name",
+        "openstack.nova.server.domain.id",
+        "openstack.domain.id",
+        "openstack.project.name",
+        "eventType()"
+      ]
+    }
+  }
+}

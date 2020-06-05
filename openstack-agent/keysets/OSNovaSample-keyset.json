@@ -1,0 +1,99 @@
+{
+  "results": [
+    {
+      "stringKeys": [
+        "agentName",
+        "agentVersion",
+        "awsRegion",
+        "coreCount",
+        "entityGuid",
+        "entityId",
+        "entityKey",
+        "entityName",
+        "event_type",
+        "fullHostname",
+        "hostname",
+        "instanceType",
+        "integrationName",
+        "integrationVersion",
+        "integration_name",
+        "integration_version",
+        "kernelVersion",
+        "linuxDistribution",
+        "nr.entityType",
+        "openstack.domain.id",
+        "operatingSystem",
+        "processorCount",
+        "systemMemoryBytes"
+      ],
+      "numericKeys": [
+        "criticalViolationCount",
+        "nr.ingestTimeMs",
+        "openstack.compute.agents_count",
+        "openstack.compute.aggregates_count",
+        "openstack.compute.flavors_count",
+        "openstack.compute.keypairs_count",
+        "openstack.compute.services_count",
+        "timestamp",
+        "warningViolationCount"
+      ],
+      "booleanKeys": [],
+      "allKeys": [
+        "agentName",
+        "agentVersion",
+        "awsRegion",
+        "coreCount",
+        "criticalViolationCount",
+        "entityGuid",
+        "entityId",
+        "entityKey",
+        "entityName",
+        "event_type",
+        "fullHostname",
+        "hostname",
+        "instanceType",
+        "integrationName",
+        "integrationVersion",
+        "integration_name",
+        "integration_version",
+        "kernelVersion",
+        "linuxDistribution",
+        "nr.entityType",
+        "nr.ingestTimeMs",
+        "openstack.compute.agents_count",
+        "openstack.compute.aggregates_count",
+        "openstack.compute.flavors_count",
+        "openstack.compute.keypairs_count",
+        "openstack.compute.services_count",
+        "openstack.domain.id",
+        "operatingSystem",
+        "processorCount",
+        "systemMemoryBytes",
+        "timestamp",
+        "warningViolationCount"
+      ]
+    }
+  ],
+  "metadata": {
+    "eventTypes": [
+      "OSNovaSample"
+    ],
+    "eventType": "OSNovaSample",
+    "openEnded": true,
+    "beginTime": "2020-05-29T06:01:10Z",
+    "endTime": "2020-05-29T07:01:10Z",
+    "beginTimeMillis": 1590732070065,
+    "endTimeMillis": 1590735670065,
+    "rawSince": "60 MINUTES AGO",
+    "rawUntil": "NOW",
+    "rawCompareWith": "",
+    "guid": "58d78a0d-76c8-b051-3402-96df68c0eee1",
+    "routerGuid": "91eb8fa7-6e6a-6408-cd43-45cc5af1758a",
+    "messages": [],
+    "contents": [
+      {
+        "function": "keyset"
+      }
+    ]
+  }
+}

@@ -1,0 +1,431 @@
+{
+  "dashboard": {
+    "id": 1143087,
+    "title": "OpenStack Overview",
+    "description": null,
+    "icon": "bar-chart",
+    "created_at": "2020-03-26T20:15:50Z",
+    "updated_at": "2020-04-04T06:32:17Z",
+    "visibility": "all",
+    "editable": "editable_by_owner",
+    "ui_url": "https://insights.newrelic.com/accounts/739516/dashboards/1143087",
+    "api_url": "https://api.newrelic.com/v2/dashboards/1143087",
+    "owner_email": "shahram@newrelic.com",
+    "metadata": {
+      "version": 1
+    },
+    "widgets": [
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 1
+        },
+        "widget_id": 16415667,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select count(*) from OSBlockStorageSample, OSHypervisorSample, OSLimitSample, OSNetworkSample, OSServerSample facet eventType()"
+          }
+        ],
+        "presentation": {
+          "title": "OpenStack Events",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 2
+        },
+        "widget_id": 16416006,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.domain.id`) from OSNetworkSample facet `openstack.domain.id`"
+          }
+        ],
+        "presentation": {
+          "title": "Domains",
+          "notes": null,
+          "drilldown_dashboard_id": 1143087
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 3
+        },
+        "widget_id": 16415849,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.project.name`) from OSBlockStorageSample, OSHypervisorSample, OSLimitSample, OSNetworkSample, OSServerSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Projects",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 2,
+          "column": 1
+        },
+        "widget_id": 16415722,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.nova.hypervisor.hypervisor_hostname`) from OSHypervisorSample facet `openstack.nova.hypervisor.hypervisor_hostname`"
+          }
+        ],
+        "presentation": {
+          "title": "Hypervisors",
+          "notes": null,
+          "drilldown_dashboard_id": 1141333
+        }
+      },
+      {
+        "visualization": "line_chart",
+        "layout": {
+          "width": 2,
+          "height": 1,
+          "row": 2,
+          "column": 2
+        },
+        "widget_id": 16416361,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.nova.hypervisor.load_average_1`), average(`openstack.nova.hypervisor.load_average_5`), average(`openstack.nova.hypervisor.load_average_15`) from OSHypervisorSample timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Load Average",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 3,
+          "column": 1
+        },
+        "widget_id": 16415729,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.nova.server.name`) from OSServerSample facet `openstack.nova.server.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Servers",
+          "notes": null,
+          "drilldown_dashboard_id": 1141293
+        }
+      },
+      {
+        "visualization": "faceted_line_chart",
+        "layout": {
+          "width": 2,
+          "height": 1,
+          "row": 3,
+          "column": 2
+        },
+        "widget_id": 16416738,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.nova.server.memory-actual`) from OSServerSample facet openstack.nova.server.name timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Actual Memory",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 4,
+          "column": 1
+        },
+        "widget_id": 16594565,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.neutron.network.name`) from OSNetworkSample facet  `openstack.neutron.network.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Networks",
+          "notes": null,
+          "drilldown_dashboard_id": 1143097
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 4,
+          "column": 2
+        },
+        "widget_id": 16594637,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.nova.server.id`) as 'Servers' from OSServerSample"
+          }
+        ],
+        "presentation": {
+          "title": "Total Server Count",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 4,
+          "column": 3
+        },
+        "widget_id": 16433366,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.project.name`) from OSBlockStorageSample, OSLimitSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Project Limits",
+          "notes": null,
+          "drilldown_dashboard_id": 1144050
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 5,
+          "column": 1
+        },
+        "widget_id": 16594639,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.nova.hypervisor.hypervisor_hostname`) as 'Hypervisors' from OSHypervisorSample"
+          }
+        ],
+        "presentation": {
+          "title": "Total Hypervisor Count",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 5,
+          "column": 2
+        },
+        "widget_id": 16594640,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.project.name`) as 'Projects' from OSBlockStorageSample, OSHypervisorSample, OSLimitSample, OSNetworkSample, OSServerSample"
+          }
+        ],
+        "presentation": {
+          "title": "Total Projects",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 5,
+          "column": 3
+        },
+        "widget_id": 16594642,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.neutron.network.id`) as 'Networks' from OSNetworkSample"
+          }
+        ],
+        "presentation": {
+          "title": "Total Networks",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 6,
+          "column": 1
+        },
+        "widget_id": 16594713,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select max(`openstack.cinder.snapshots.count`) as 'Snapshots' from OSBlockStorageSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Snapshot Count",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 6,
+          "column": 2
+        },
+        "widget_id": 16594746,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select max(`openstack.cinder.snapshots.size`) as 'Snapshots Size' from OSBlockStorageSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Snapshots Size",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 6,
+          "column": 3
+        },
+        "widget_id": 16594833,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select max(`openstack.cinder.limits.totalVolumesUsed`) as 'totalVolumesUsed' from OSBlockStorageSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Snapshot Total Voulmes Used",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 7,
+          "column": 1
+        },
+        "widget_id": 16594834,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select max(`openstack.cinder.limits.totalSnapshotsUsed`) as 'totalSnapshotsUsed' from OSBlockStorageSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Total Snapshots Used",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 7,
+          "column": 2
+        },
+        "widget_id": 16594853,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select max(`openstack.cinder.limits.totalGigabytesUsed`) as 'totalGigabytesUsed' from OSBlockStorageSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "Snapshot Total Gigabytes Used",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "facet_bar_chart",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 7,
+          "column": 3
+        },
+        "widget_id": 16594941,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select maX(`openstack.cinder.limits.totalBackupsUsed`) as 'totalBackupsUsed' from OSBlockStorageSample facet `openstack.project.name`"
+          }
+        ],
+        "presentation": {
+          "title": "",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      }
+    ],
+    "filter": {
+      "event_types": [
+        "OSNetworkSample",
+        "OSBlockStorageSample",
+        "OSHypervisorSample",
+        "OSLimitSample",
+        "OSServerSample"
+      ],
+      "attributes": [
+        "openstack.project.name",
+        "openstack.domain.id",
+        "eventType()"
+      ]
+    }
+  }
+}

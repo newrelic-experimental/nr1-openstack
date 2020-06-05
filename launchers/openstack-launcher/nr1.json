@@ -1,0 +1,7 @@
+{
+    "schemaType": "LAUNCHER",
+    "id": "openstack-launcher",
+    "displayName": "OpenStack",
+    "description": "OpenStack dashbaord",
+    "rootNerdletId": "openstack-nerdlet"
+}

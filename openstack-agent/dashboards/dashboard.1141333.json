@@ -1,0 +1,264 @@
+{
+  "dashboard": {
+    "id": 1141333,
+    "title": "OpenStack Hypervisors",
+    "description": null,
+    "icon": "bar-chart",
+    "created_at": "2020-03-25T17:17:56Z",
+    "updated_at": "2020-04-04T05:45:01Z",
+    "visibility": "all",
+    "editable": "editable_by_all",
+    "ui_url": "https://insights.newrelic.com/accounts/739516/dashboards/1141333",
+    "api_url": "https://api.newrelic.com/v2/dashboards/1141333",
+    "owner_email": "shahram@newrelic.com",
+    "metadata": {
+      "version": 1
+    },
+    "widgets": [
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 1
+        },
+        "widget_id": 16380430,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.domain.id`) as Domain from OSHypervisorSample facet `openstack.domain.id`"
+          }
+        ],
+        "presentation": {
+          "title": "Domains",
+          "notes": null,
+          "drilldown_dashboard_id": 1141333
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 2
+        },
+        "widget_id": 16431549,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.nova.hypervisor.id`) as hypervisors from OSHypervisorSample"
+          }
+        ],
+        "presentation": {
+          "title": "Hypervisors",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 1,
+          "column": 3
+        },
+        "widget_id": 16380431,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select uniqueCount(`openstack.nova.hypervisor.id`) as Hypervisors from OSHypervisorSample facet  `openstack.nova.hypervisor.host_ip`"
+          }
+        ],
+        "presentation": {
+          "title": "Hypervisors",
+          "notes": null,
+          "drilldown_dashboard_id": 1141333
+        }
+      },
+      {
+        "visualization": "facet_table",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 2,
+          "column": 1
+        },
+        "widget_id": 16439998,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "SELECT latest(`openstack.nova.hypervisor.user_count`) as 'user count' from OSHypervisorSample since 10 minutes ago until 2 seconds ago facet `openstack.nova.hypervisor.host_ip`"
+          }
+        ],
+        "presentation": {
+          "title": "User Count per Hypervisor",
+          "notes": null,
+          "drilldown_dashboard_id": null
+        }
+      },
+      {
+        "visualization": "line_chart",
+        "layout": {
+          "width": 2,
+          "height": 1,
+          "row": 2,
+          "column": 2
+        },
+        "widget_id": 16433456,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "select average(`openstack.nova.hypervisor.load_average_1`), average(`openstack.nova.hypervisor.load_average_5`), average(`openstack.nova.hypervisor.load_average_15`) from OSHypervisorSample timeseries"
+          }
+        ],
+        "presentation": {
+          "title": "Load Average",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 3,
+          "column": 1
+        },
+        "widget_id": 16433889,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "SELECT average(`openstack.nova.hypervisor.running_vms`) as 'Running Vms' from OSHypervisorSample"
+          }
+        ],
+        "presentation": {
+          "title": "Running VMs",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "line_chart",
+        "layout": {
+          "width": 2,
+          "height": 1,
+          "row": 3,
+          "column": 2
+        },
+        "widget_id": 16433875,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "SELECT average(`openstack.nova.hypervisor.free_ram_mb`), average(`openstack.nova.hypervisor.memory_mb`), average(`openstack.nova.hypervisor.memory_mb_used`) from OSHypervisorSample TIMESERIES"
+          }
+        ],
+        "presentation": {
+          "title": "mem utilization",
+          "notes": null
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 4,
+          "column": 1
+        },
+        "widget_id": 16433909,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "SELECT average(`openstack.nova.hypervisor.vcpus_used`) as 'Used Vcpus' from OSHypervisorSample"
+          }
+        ],
+        "presentation": {
+          "title": "Used Virtual CPUs",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 4,
+          "column": 2
+        },
+        "widget_id": 16433840,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "SELECT average(`openstack.nova.hypervisor.free_disk_gb`) as 'Free Disk' from OSHypervisorSample"
+          }
+        ],
+        "presentation": {
+          "title": "Free Disk (gb)",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 4,
+          "column": 3
+        },
+        "widget_id": 16433824,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "SELECT average(`openstack.nova.hypervisor.disk_available_least`) as 'Available Disk Least' from OSHypervisorSample"
+          }
+        ],
+        "presentation": {
+          "title": "Available Disk Least",
+          "notes": null,
+          "threshold": {}
+        }
+      },
+      {
+        "visualization": "billboard",
+        "layout": {
+          "width": 1,
+          "height": 1,
+          "row": 5,
+          "column": 1
+        },
+        "widget_id": 16433681,
+        "account_id": 739516,
+        "data": [
+          {
+            "nrql": "SELECT average(`openstack.nova.hypervisor.current_workload`) as 'Workload' from OSHypervisorSample"
+          }
+        ],
+        "presentation": {
+          "title": "Workload",
+          "notes": null,
+          "threshold": {}
+        }
+      }
+    ],
+    "filter": {
+      "event_types": [
+        "OSServerSample",
+        "OSHypervisorSample"
+      ],
+      "attributes": [
+        "openstack.nova.server.project.name",
+        "openstack.nova.server.id",
+        "openstack.nova.server.name",
+        "openstack.nova.server.domain.id",
+        "openstack.nova.hypervisor.host_ip",
+        "openstack.domain.id",
+        "openstack.nova.hypervisor.hypervisor_hostname"
+      ]
+    }
+  }
+}
