@@ -8,7 +8,7 @@
 
 Visualization for the OpenStack environment.
 
-![Screenshot #1](screenshots/screenshot_01.png)
+![Screenshot #1](screenshots/screenshot_02.png)
 
 ## Open source license
 
