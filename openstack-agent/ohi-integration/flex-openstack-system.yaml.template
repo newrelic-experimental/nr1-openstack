@@ -71,9 +71,9 @@ integrations:
           inventory:
             id: name
           value_mapper:
-            load_average=>load_average_1:
+            load_average=>loadAverageOneMinute:
               - (.+), (.+), (.+)=>$1
-            load_average=>load_average_5:
+            load_average=>loadAverageFiveMinute:
               - (.+), (.+), (.+)=>$2
-            load_average=>load_average_15:
+            load_average=>loadAverageFifteenMinute:
               - (.+), (.+), (.+)=>$3
