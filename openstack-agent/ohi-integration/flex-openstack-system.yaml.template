@@ -1,6 +1,5 @@
 integrations:
   - name: nri-flex
-    exec: /var/db/newrelic-infra/newrelic-integrations/bin/nri-flex-c8b27714-2
     inventory_source: metadata/system
     interval: 60s
     config:
@@ -62,6 +61,7 @@ integrations:
           entity: ${lookup.OpenStackHypervisorLookupSample:Hypervisor Hostname}:${lookup.OpenStackHypervisorLookupSample:ID}
           commands:
             - run: openstack hypervisor show ${lookup.OpenStackHypervisorLookupSample:ID} -f json ${var:authString} --os-project-id=${lookup.OpenStackHypervisorLookupSample:projectID}
+              split_by: ":"
           remove_keys:
             - cpu_info
           custom_attributes:
@@ -70,8 +70,10 @@ integrations:
             - ID
           inventory:
             id: name
-          # pluck_numbers: true
           value_mapper:
-            load_average:
+            load_average=>load_average_1:
               - (.+), (.+), (.+)=>$1
-
+            load_average=>load_average_5:
+              - (.+), (.+), (.+)=>$2
+            load_average=>load_average_15:
+              - (.+), (.+), (.+)=>$3
