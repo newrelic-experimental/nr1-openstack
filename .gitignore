@@ -1,0 +1,9 @@
+.DS_Store
+config/os-config.json
+scripts/osmetrics.sh
+ohi-integration/flex-openstack.yaml
+*.pyc
+data/
+logs/
+tmp/
+
