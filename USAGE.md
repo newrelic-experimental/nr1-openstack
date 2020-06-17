@@ -55,9 +55,25 @@ The Observability Map shows the relationship of OpenStack components (hypervisor
 
 ---
 ### Dashboards
-Any dashboards that are created in New Relic One can be accessed easily from any of the above visualization methods, and additionally you could search for any dashboards in New Relic One's **"Dashboards"** tile to view them directly.
+The above OpenStack visualizations include links to a standard set of pre-defined dashboards built in the New Relic dashboard interface. Users can also create their own dashboards from the OpenStack events reported in New Relic Insights through the Chart Builder and Dashboard Editor. The pre-defined dashboards include:
 
+**OpenStack Overview**: A summary of OpenStack health providing a overview of components including hypervisors, virtual machines, domains, projects, networks, and snapshots. 
+![Hypervisor Dashboard](screenshots/screenshot_OS_Overview_DB.png)
 
+**OpenStack Hypervisors**: Hypervisor status and resources including: user count; running VMs; CPU. memory, and disk utilization. 
+![Hypervisor Dashboard](screenshots/screenshot_OS_Hypervisor_DB.png)
+
+**OpenStack Networks**: Network status including: network names, status, maximum transmission units, and admin state. 
+![Hypervisor Dashboard](screenshots/screenshot_OS_Networks_DB.png)
+
+**OpenStack Projects**: Overview of server resources by Project including: server names, I/O Bytes sent/received, and block storage.  
+![Hypervisor Dashboard](screenshots/screenshot_OS_Projects_DB.png)
+
+**OpenStack Project Limits**: Limits for block storage and compute resources by project. 
+![Hypervisor Dashboard](screenshots/screenshot_OS_Project_Limits_DB.png)
+
+**OpenStack Servers**: server statistics including: network packets sent/received,  network packet errors sent/received, network packet drops sent/received.  
+![Hypervisor Dashboard](screenshots/screenshot_OS_Servers_DB.png)
 
 ---
 ## Alerting
