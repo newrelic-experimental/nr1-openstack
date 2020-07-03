@@ -10,6 +10,13 @@ This folder contains New Relic Infrastructure Flex integration for OpenStack ser
 - Ensure that you have a working openstack environment
 - Ensure that **"python 2.7"** is installed on your system
 
+	**Note:** if **"python2.7"** is not symbolically linked to **"python"** on your system, you can either create a symbolic link using the following command:
+
+	```bash
+	  sudo ln -s /usr/bin/python2.7 /usr/bin/python
+	```
+
+	or in **"scripts/flex-osmetrics.sh"** change **"python"** to **"python2.7"**
 
 
 ## Installation
