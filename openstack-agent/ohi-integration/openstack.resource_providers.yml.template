@@ -1,0 +1,15 @@
+---
+# change all base directories to NR Openstack agent home directory 
+# "_ABSOLUTE_PATH_TO_NR_AGENT_HOME_DIR_" -> NR Openstack agent installation location
+integrations:
+  - name: nri-flex
+    interval: 30s
+    config:
+      name: openstackTestIntegration
+      variable_store:
+        nrAgentHome: _ABSOLUTE_PATH_TO_NR_AGENT_HOME_DIR_
+        osServiceType: resource_providers
+      apis:
+        - name: OSResourceProvider
+          commands:
+            - run: "mkdir -p ${var:nrAgentHome}/logs 2>/dev/null ; ${var:nrAgentHome}/scripts/flex-osmetrics.sh ${var:osServiceType} 2>>${var:nrAgentHome}/logs/os-mon-${var:osServiceType}-err.log"
