@@ -1,4 +1,5 @@
 import sys
+import argparse
 import os
 import time
 import json
@@ -12,14 +13,22 @@ class InvalidConfig(Exception):
 class OpenStackInit:
   # ----------------------------------------
   def __init__(self):
+     
+    parser = argparse.ArgumentParser(description='A tutorial of argparse!')
+    parser.add_argument("-c", "--config", "--config_file", "--configFile", type=str)
+    parser.add_argument("-s", "--service", "--service_type", "--serviceType",
+      choices=["servers", "limits", "block_storage", "networks", "hypervisors", "keystone", "nova", "resource_providers", "images"], 
+      type=str, default="all")
+     
+    args = parser.parse_args()
+
+    cfgFileName = args.config
+    self.serviceType = args.service
+
 
     try:
       # print("command: ", sys.argv[0], len(sys.argv))
-      if len(sys.argv) > 1:
-        # print("looking for config file specified in command line arg")
-        cfgFileName = sys.argv[1]
-
-      else:
+      if cfgFileName == None:
         path = sys.argv[0]
         p1 = path.rfind("/")
         if p1 > -1:
@@ -125,11 +134,12 @@ class OpenStackInit:
   def prepareEnvironment(self):
     timestamp = int(round(time.time() * 1000))
     output_file_handles = {}
-    for service_name, service_status in self.os_config.get("config").get("service_types").items():
-      if service_status["enabled"]:
-        dir = os.path.join(self.os_config.get("config").get("nr_agent_home"), "data", service_name)
+    for service_type, service in self.os_config.get("config").get("service_types").items():
+      if (service_type == self.serviceType or self.serviceType == "all") and service["enabled"]:
+        dir = os.path.join(self.os_config.get("config").get("nr_agent_home"), "data", service_type)
         self.createDirectory(dir)
-        outfile = os.path.join(dir, "{0}_{1}.json".format(service_name, timestamp))
-        output_file_handles[service_name] = self.createOutPutFile(outfile)
+        outfile = os.path.join(dir, "{0}_{1}.json".format(service_type, timestamp))
+        output_file_handles[service_type] = self.createOutPutFile(outfile)
 
     self.os_config["output_file_handles"] = output_file_handles
+

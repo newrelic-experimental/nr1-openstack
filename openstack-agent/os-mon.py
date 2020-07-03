@@ -23,11 +23,13 @@ init.prepareEnvironment()
 file_handles = init.getFileHandles()
 logger.log(logging.DEBUG, ">> file handles: %s", file_handles)
 osAuth = osauth.OpenStackAuth(config, init.getServiceTypes())
-metrics = osmetrics.ProcessMetrics(osAuth, config, file_handles)
+metrics = osmetrics.ProcessMetrics(osAuth, config, file_handles, init.serviceType)
 
 metrics.getProjectMetrics()
 
 metrics.getSystemMetrics()
+
+metrics.close_output_files()
 
 logger.log(logging.WARNING, ">>> Terminating NR Openstack Monitor")
 

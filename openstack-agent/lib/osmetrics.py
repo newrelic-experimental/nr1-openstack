@@ -10,10 +10,11 @@ logger = logging.getLogger("nr.os.mon.metrics")
 class ProcessMetrics:
 
   # ----------------------------------------
-  def __init__(self, os_auth, config, file_handles):
+  def __init__(self, os_auth, config, file_handles, service_type):
     self.os_auth = os_auth
     self.config = config
     self.file_handles = file_handles
+    self.service_type = service_type
     self.current_project = {}
 
 
@@ -22,12 +23,14 @@ class ProcessMetrics:
     # write metrics to outfile files
     logger.log(logging.DEBUG, "in write_result: " + str(fh))
     fh.write(message + "\n")
+    fh.flush()
 
 
   # ----------------------------------------
   def close_output_files(self):
     for fh in self.file_handles:
       logger.log(logging.DEBUG, "closing output channel for %s " + str(fh))
+      self.file_handles[fh].flush()
       self.file_handles[fh].close()
 
 
@@ -240,10 +243,6 @@ class ProcessMetrics:
       del network_metrics["network"]["availability_zone_hints"]
       del network_metrics["network"]["tags"]
 
-      for resource in ["routers", "subnets", "floatingips", "security-groups"]:
-        resource_count = self.getNetworkResourceCount(service, resource)
-        network_metrics["network"]["{0}_count".format(resource.replace("-", "_"))] = resource_count
-
       metrics = json.dumps(network_metrics)
 
       self.write_result(
@@ -347,8 +346,8 @@ class ProcessMetrics:
     traverseEvent(ev)
     event["openstack.domain.id"] = "default"
     if resource == "project":
-      event["openstack.project.id"] = "123456-6756-2345-5612-56785678"
-      event["openstack.project.name"] = "admin"
+      event["openstack.project.id"] = self.current_project["id"]
+      event["openstack.project.name"] = self.current_project["name"]
     
     return json.dumps(event)
 
@@ -383,6 +382,10 @@ class ProcessMetrics:
         logger.log(logging.ERROR, ">>>> error message: %s", sys.exc_info())
         logger.log(logging.ERROR, ">>>> response body: %s", json.dumps(resp))
 
+    for resource in ["routers", "subnets", "floatingips", "security-groups"]:
+      resource_count = self.getNetworkResourceCount(service, resource)
+      resource_metrics["{0}_count".format(resource.replace("-", "_"))] = resource_count
+
     metrics = json.dumps(resource_metrics)
 
     return metrics
@@ -395,7 +398,7 @@ class ProcessMetrics:
     logger.log(logging.DEBUG, ">>> SERVICES: %s", json.dumps(service, sort_keys=True, indent=2, separators=(',', ': ')))
 
     # keystone metrics
-    if self.config["service_types"]["keystone"]["enabled"]:
+    if (self.service_type == "all" or self.service_type == "keystone") and self.config["service_types"]["keystone"]["enabled"]:
       logger.log(logging.INFO, ">>> collecting keystone count metrics")
       keystone_endpoints = [
         "/auth/projects",
@@ -409,6 +412,8 @@ class ProcessMetrics:
         "/roles"
       ]
       metrics = self.getSystemCounts(service, "identity", keystone_endpoints)
+
+
       if metrics:
         self.write_result(
           self.file_handles["keystone"],
@@ -416,7 +421,7 @@ class ProcessMetrics:
         )
 
     #nova resource counts
-    if self.config["service_types"]["nova"]["enabled"]:
+    if (self.service_type == "all" or self.service_type == "nova") and self.config["service_types"]["nova"]["enabled"]:
       logger.log(logging.INFO, ">>> collecting nova count metrics")
       nova_endpoints = [
         "/os-keypairs",
@@ -433,22 +438,22 @@ class ProcessMetrics:
         )
 
     # hypervisors
-    if self.config["service_types"]["hypervisors"]["enabled"]:
+    if (self.service_type == "all" or self.service_type == "hypervisors") and self.config["service_types"]["hypervisors"]["enabled"]:
       logger.log(logging.INFO, ">>> collecting hypervisors metrics")
       self.getHypervisorMetrics(service)
 
     # networks
-    if self.config["service_types"]["networks"]["enabled"]:
+    if (self.service_type == "all" or self.service_type == "networks") and self.config["service_types"]["networks"]["enabled"]:
       logger.log(logging.INFO, ">>> collecting networks metrics")
       self.getNetworkMetrics(service)
 
     # glance
-    if self.config["service_types"]["images"]["enabled"]:
+    if (self.service_type == "all" or self.service_type == "images") and self.config["service_types"]["images"]["enabled"]:
       logger.log(logging.INFO, ">>> collecting image data")
       self.getGlanceMetrics(service)
 
     # placement
-    if self.config["service_types"]["resource_providers"]["enabled"]:
+    if (self.service_type == "all" or self.service_type == "resource_providers") and self.config["service_types"]["resource_providers"]["enabled"]:
       logger.log(logging.INFO, ">>> collecting resource providers' inventory and usage")
       self.getPlacementMetrics(service)
 
@@ -478,17 +483,17 @@ class ProcessMetrics:
       self.current_project = project
 
       # project servers
-      if self.config["service_types"]["servers"]["enabled"]:
+      if (self.service_type == "all" or self.service_type == "servers") and self.config["service_types"]["servers"]["enabled"]:
         logger.log(logging.INFO, ">>> collecting server metrics for project %s", project["name"])
         self.getServerMetrics(project)
 
       # project limits
-      if self.config["service_types"]["limits"]["enabled"]:
+      if (self.service_type == "all" or self.service_type == "limits") and self.config["service_types"]["limits"]["enabled"]:
         logger.log(logging.INFO, ">>> collecting limits for project %s", project["name"])
         self.getProjectLimits(project)
 
       # project block storage
-      if self.config["service_types"]["block_storage"]["enabled"]:
+      if (self.service_type == "all" or self.service_type == "block_storage") and self.config["service_types"]["block_storage"]["enabled"]:
         logger.log(logging.INFO, ">>> collecting block storage limits for project %s", project["name"])
         self.getBlockStorageMetrics(project)
 

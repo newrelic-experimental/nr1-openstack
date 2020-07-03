@@ -1,6 +1,6 @@
 {
   "config": {
-    "nr_agent_home": "_ABSOLUTE_PATH_TO_/newrelic-openstack-integration",
+    "nr_agent_home": "_ABSOLUTE_PATH_TO_NR_AGENT_HOME_DIR_",
     "keystone_url": "_KEYSTONE_URL_",
     "keystone_api_version": "v3",
     "nova_api_version": "v2.1",
@@ -29,9 +29,12 @@
           "openstack.identity.regions_count",
           "openstack.identity.roles_count",
           "openstack.identity.services_count",
-          "openstack.identity.users_count"
+          "openstack.identity.users_count",
+          "openstack.identity.floatingips_count",
+          "openstack.identity.routers_count",
+          "openstack.identity.security_groups_count",
+          "openstack.identity.subnets_count"
         ]
-
       },
       "hypervisors": {
         "enabled": true,
@@ -291,7 +294,8 @@
       "logger_name": "nr.os.mon",
       "log_file_name": "nr_openstack_agent.log",
       "log_level": "WARNING",
-      "formatter": "%(asctime)-15s | %(name)-18s | %(levelname)-8s | %(threadName)s | %(funcName)-20s | %(lineno)04d | %(message)s"
+      "formatter": "%(asctime)-15s | %(name)-18s | %(process)d | %(levelname)-8s | %(threadName)s | %(funcName)-27s | %(lineno)04d | %(message)s"
     }
   }
 }
+
