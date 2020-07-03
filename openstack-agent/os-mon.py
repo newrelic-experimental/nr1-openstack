@@ -16,7 +16,7 @@ NR_OSMON_VERSION = '1.0.6'
 init = osinit.OpenStackInit()
 config = init.getConfig()
 logger = osutils.setLogging(config)
-logger.log(logging.WARNING, ">>> Starting NR Openstack Monitor %s", NR_OSMON_VERSION)
+logger.log(logging.WARNING, ">>> Starting NR Openstack Monitor %s -- service: %s", NR_OSMON_VERSION, init.serviceType)
 # logger.log(logging.DEBUG, ">> config: %s", config) # contains user creds
 
 init.prepareEnvironment()
@@ -31,7 +31,7 @@ metrics.getSystemMetrics()
 
 metrics.close_output_files()
 
-logger.log(logging.WARNING, ">>> Terminating NR Openstack Monitor")
+logger.log(logging.WARNING, ">>> Terminating NR Openstack Monitor for %s", init.serviceType)
 
 #################################################################
 #################################################################
