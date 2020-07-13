@@ -100,7 +100,7 @@ export default class DomainBoard extends React.Component {
                     <div className="pills">
                       {domains[domain][project].map(server => (
                         <div
-                          key={server.guid}
+                          key={server.name}
                           className={`pill border-${blockColor(
                             server.alertSeverity,
                             server.reporting
@@ -108,7 +108,7 @@ export default class DomainBoard extends React.Component {
                         >
                           <div className="block">
                             <Tooltip
-                              key={server.guid}
+                              key={server.name}
                               text={server.name}
                               placementType={Tooltip.PLACEMENT_TYPE.BOTTOM}
                             >

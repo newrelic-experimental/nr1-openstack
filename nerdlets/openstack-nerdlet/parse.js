@@ -11,8 +11,8 @@ exports.data = res => {
       hostSummary: {
         cpuUtilizationPercent: (cur.hostSummary || {}).cpuUtilizationPercent,
         diskUsedPercent: (cur.hostSummary || {}).diskUsedPercent,
-        memoryUsedPercent: (cur.hostSummary || {}).memoryUsedPercent
-      }
+        memoryUsedPercent: (cur.hostSummary || {}).memoryUsedPercent,
+      },
     };
     return acc;
   }, {});
@@ -32,86 +32,74 @@ exports.data = res => {
             name: cur.name,
             guid: cur.guid,
             reporting: cur.reporting,
-            alertSeverity: cur.alertSeverity
+            alertSeverity: cur.alertSeverity,
           });
         });
     });
     return acc;
   }, {});
 
-  const dataObj = (((actor.account || {}).nrql || {}).results || []).reduce(
-    (acc, cur) => {
-      const guid = cur.entityGuid;
-      const reporting =
-        cur.entityGuid in hostEntities
-          ? hostEntities[cur.entityGuid].reporting
-          : null;
-      const alertSeverity =
-        cur.entityGuid in hostEntities
-          ? hostEntities[cur.entityGuid].alertSeverity
-          : null;
+  const dataObj = { hosts: {}, domains: {} };
 
-      if (cur.entityName.includes('instance:')) {
-        const nameParts = cur.entityName.split(':');
-        const hostName = nameParts[1];
-        const hypervisorName = nameParts[2];
-        const serverName = nameParts[3];
+  dataObj.hypervisors = (
+    ((actor.account || {}).hypervisors || {}).results || []
+  ).reduce((acc, cur) => {
+    acc[cur.facet[0]] = {
+      availableMemory: cur.availableMemory,
+      cpuPercent1Minute: cur.cpuPercent1Minute,
+      cpuPercent5Minute: cur.cpuPercent5Minute,
+      cpuPercent15Minute: cur.cpuPercent15Minute,
+      diskUsedPct: cur.diskUsedPct,
+      diskUsedPercent: cur.diskUsedPercent,
+      domain: cur.domain,
+      memoryUsedPct: cur.memoryUsedPct,
+      runningVMs: cur.runningVMs,
+      totalMemory: cur.totalMemory,
+      usedVCPUs: cur.usedVCPUs,
+      name: cur.facet[1],
+      guid: null,
+      host: cur.facet[0],
+      alertSeverity: null,
+      reporting: null,
+      servers: [],
+    };
+    return acc;
+  }, {});
 
-        if (!(hypervisorName in acc.hypervisors))
-          acc.hypervisors[hypervisorName] = { servers: [] };
+  (((actor.account || {}).servers || {}).results || []).map(server => {
+    const hypervisor = server.hypervisorName;
+    const serverName = server.facet[0];
+    const domain = server.domain;
+    const project = server.projectName;
+    const serverObj = {
+      name: serverName,
+      fullName: serverName,
+      apps: serverName in serverApps ? serverApps[serverName] : [],
+      actualMemory: server.actualMemory,
+      availableMemory: server.availableMemory,
+      memoryUsedPct: server.memoryUsedPct,
+      projectId: server.projectId,
+      projectName: project,
+      domain: domain,
+      rssMemory: server.rssMemory,
+      unusedMemory: server.unusedMemory,
+      usableMemory: server.usableMemory,
+      guid: null,
+      reporting: null,
+      alertSeverity: null,
+    };
 
-        if (hypervisorName && !serverName) {
-          Object.assign(acc.hypervisors[hypervisorName], {
-            name: hypervisorName,
-            host: hostName,
-            fullName: cur.entityName,
-            diskUsedPct: cur.diskUsedPct,
-            memoryUsedPct: cur.memoryUsedPct,
-            runningVMs: cur.runningVMs,
-            usedVCPUs: cur.usedVCPUs,
-            guid,
-            reporting,
-            alertSeverity
-          });
-        }
-
-        if (hypervisorName && serverName) {
-          const serverObj = {
-            name: serverName,
-            fullName: cur.entityName,
-            apps: serverName in serverApps ? serverApps[serverName] : [],
-            actualMemory: cur.actualMemory,
-            availableMemory: cur.availableMemory,
-            memoryUsedPct:
-              ((cur.actualMemory - cur.availableMemory) / cur.actualMemory) *
-              100,
-            guid,
-            reporting,
-            alertSeverity
-          };
-
-          acc.hypervisors[hypervisorName].servers.push(serverObj);
-
-          if (!(cur.domain in acc.domains)) acc.domains[cur.domain] = {};
-          if (!(cur.project in acc.domains[cur.domain]))
-            acc.domains[cur.domain][cur.project] = [];
-          acc.domains[cur.domain][cur.project].push(serverObj);
-        }
-      } else {
-        acc.hosts[cur.entityName] = {
-          name: cur.entityName,
-          cpuPercent: cur.cpuPercent,
-          memoryUsedPercent: cur.memoryUsedPercent,
-          diskUsedPercent: cur.diskUsedPercent,
-          guid,
-          reporting,
-          alertSeverity
-        };
+    if (hypervisor in dataObj.hypervisors)
+      dataObj.hypervisors[hypervisor].servers.push(serverObj);
+    if (domain) {
+      if (!(domain in dataObj.domains)) dataObj.domains[domain] = {};
+      if (project) {
+        if (!(project in dataObj.domains[domain]))
+          dataObj.domains[domain][project] = [];
+        dataObj.domains[domain][project].push(serverObj);
       }
-      return acc;
-    },
-    { hosts: {}, hypervisors: {}, domains: {} }
-  );
+    }
+  });
 
   dataObj.dashboards = (
     ((actor.dashboards || {}).results || {}).entities || []
@@ -124,7 +112,7 @@ exports.data = res => {
         aggregates: cur.aggregates,
         flavors: cur.flavors,
         keypairs: cur.keypairs,
-        services: cur.services
+        services: cur.services,
       };
       return acc;
     },
@@ -143,7 +131,7 @@ exports.data = res => {
       regions: cur.regions,
       roles: cur.roles,
       services: cur.services,
-      users: cur.users
+      users: cur.users,
     };
     return acc;
   }, {});

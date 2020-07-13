@@ -79,7 +79,7 @@ export default class HypervisorBoard extends React.Component {
         </div>
         {hypervisors &&
           Object.keys(hypervisors).map(hypervisor => (
-            <div className="card parent" key={hypervisors[hypervisor].guid}>
+            <div className="card parent" key={hypervisor}>
               <div className="header">
                 <div className="type">
                   <Icon
@@ -92,7 +92,7 @@ export default class HypervisorBoard extends React.Component {
                   {hypervisors[hypervisor].host}
                   &nbsp;[{hypervisors[hypervisor].name}]
                   <Tooltip
-                    text={hypervisors[hypervisor].alertSeverity}
+                    text={hypervisors[hypervisor].alertSeverity || 'unknown'}
                     placementType={Tooltip.PLACEMENT_TYPE.BOTTOM}
                   >
                     <span
@@ -106,7 +106,7 @@ export default class HypervisorBoard extends React.Component {
                 <div className="meta" />
               </div>
               {hypervisors[hypervisor].servers.map(server => (
-                <div className="card child" key={server.guid}>
+                <div className="card child" key={server.name}>
                   <div className="header">
                     <div className="type">
                       <Icon
@@ -118,7 +118,7 @@ export default class HypervisorBoard extends React.Component {
                     <div className="title">
                       {server.name}
                       <Tooltip
-                        text={server.alertSeverity}
+                        text={server.alertSeverity || 'unknown'}
                         placementType={Tooltip.PLACEMENT_TYPE.BOTTOM}
                       >
                         <span
