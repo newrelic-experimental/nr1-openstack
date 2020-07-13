@@ -138,6 +138,7 @@ class OpenStackAuth:
         logger.log(logging.DEBUG, "service: %s -- interface: %s -- url/endpoint:  %s", service_type, interface, url)
         resp = self.os_request(url, token)
         if resp:
+          logger.log(logging.DEBUG, ">>> %s %s response: %s", service_type, endpoint, json.dumps(resp, sort_keys=True, indent=2, separators=(',', ': ')))
           return resp
 
     logger.log(logging.CRITICAL, "cannot connect to any of the service interfaces for \"%s\"", service_type)

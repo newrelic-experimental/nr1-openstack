@@ -7,7 +7,7 @@ from lib import osinit
 from lib import osauth
 from lib import osmetrics
 
-NR_OSMON_VERSION = '1.0.7'
+NR_OSMON_VERSION = '1.0.8'
 
 # ==========================================
 # -----------------------------------------------------------

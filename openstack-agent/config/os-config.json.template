@@ -205,6 +205,7 @@
           "openstack.nova.server.cpu5_time",
           "openstack.nova.server.cpu6_time",
           "openstack.nova.server.cpu7_time",
+		  "openstack.nova.server.hypervisor_name",
           "openstack.nova.server.id",
           "openstack.nova.server.memory",
           "openstack.nova.server.memory-actual",

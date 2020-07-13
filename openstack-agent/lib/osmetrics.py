@@ -35,6 +35,14 @@ class ProcessMetrics:
 
 
   # ----------------------------------------
+  def getHypervisorName(self, servers, server_id):
+    for s in servers:
+      if s['id'] == server_id:
+        return s["OS-EXT-SRV-ATTR:hypervisor_hostname"]
+    return None
+
+
+  # ----------------------------------------
   def getServerMetrics(self, project):
     # get server metrics for the "project"
     token = project["auth_token"]
@@ -45,6 +53,9 @@ class ProcessMetrics:
       logger.log(logging.WARNING, "skipping server metrics collection - could not find valid compute endpoint")
       return
 
+    endpoint = "/servers/detail"
+    servers_details = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token)
+
     for server in resp.get("servers"):
       logger.log(logging.DEBUG, "server id: %s --- server name: %s", server.get("id"), server.get("name"))
       endpoint = "/servers/{0}/diagnostics".format(server.get("id"))
@@ -54,6 +65,7 @@ class ProcessMetrics:
         return
       resp['id'] = server.get("id")
       resp['name'] = server.get("name")
+      resp['hypervisor_name'] = self.getHypervisorName(servers_details['servers'], resp['id'])
 
       keys = resp.keys()
       for key in keys:
@@ -382,9 +394,10 @@ class ProcessMetrics:
         logger.log(logging.ERROR, ">>>> error message: %s", sys.exc_info())
         logger.log(logging.ERROR, ">>>> response body: %s", json.dumps(resp))
 
-    for resource in ["routers", "subnets", "floatingips", "security-groups"]:
-      resource_count = self.getNetworkResourceCount(service, resource)
-      resource_metrics["{0}_count".format(resource.replace("-", "_"))] = resource_count
+    if service_type == "identity":
+      for resource in ["routers", "subnets", "floatingips", "security-groups"]:
+        resource_count = self.getNetworkResourceCount(service, resource)
+        resource_metrics["{0}_count".format(resource.replace("-", "_"))] = resource_count
 
     metrics = json.dumps(resource_metrics)
 
