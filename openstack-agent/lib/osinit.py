@@ -13,13 +13,13 @@ class InvalidConfig(Exception):
 class OpenStackInit:
   # ----------------------------------------
   def __init__(self):
-     
-    parser = argparse.ArgumentParser(description='A tutorial of argparse!')
+
+    parser = argparse.ArgumentParser(description='Parser')
     parser.add_argument("-c", "--config", "--config_file", "--configFile", type=str)
     parser.add_argument("-s", "--service", "--service_type", "--serviceType",
-      choices=["servers", "limits", "block_storage", "networks", "hypervisors", "keystone", "nova", "resource_providers", "images"], 
+      choices=["servers", "limits", "block_storage", "networks", "hypervisors", "keystone", "nova", "resource_providers", "images"],
       type=str, default="all")
-     
+
     args = parser.parse_args()
 
     cfgFileName = args.config
@@ -134,7 +134,7 @@ class OpenStackInit:
   def prepareEnvironment(self):
     timestamp = int(round(time.time() * 1000))
     output_file_handles = {}
-    for service_type, service in self.os_config.get("config").get("service_types").items():
+    for service_type, service in list(self.os_config.get("config").get("service_types").items()):
       if (service_type == self.serviceType or self.serviceType == "all") and service["enabled"]:
         dir = os.path.join(self.os_config.get("config").get("nr_agent_home"), "data", service_type)
         self.createDirectory(dir)

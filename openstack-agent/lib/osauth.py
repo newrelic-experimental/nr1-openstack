@@ -1,7 +1,8 @@
 import sys
 import json
 import logging
-import urllib2
+import ssl
+import urllib.request, urllib.error, urllib.parse
 from lib import osutils
 
 logger = logging.getLogger("nr.os.mon.auth")
@@ -14,6 +15,7 @@ class OpenStackAuth:
     self.user = config["user"]["name"]
     self.password = config["user"]["password"]
     self.domain = config["user"]["domain"]["id"]
+    self.ssl_verify = config["ssl_verify"]
 
     self.service_types = service_types
 
@@ -53,22 +55,32 @@ class OpenStackAuth:
     if not auth_scope:
         auth_scope = "unscoped"
 
+    logger.log(logging.DEBUG, f"ssl_verify: {ssl_verify}")
+
+    ctx = ssl.create_default_context()
+    if not ssl_verify:
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+
     payload = {"auth": {"identity": identity, "scope": auth_scope}}
+
+    data = json.dumps(payload)
+    data = data.encode('ascii')
 
     headers = {"Content-Type": "application/json"}
 
     try:
-      req = urllib2.Request(
+      req = urllib.request.Request(
         url,
-        data=json.dumps(payload),
+        data,
         headers=headers,
       )
-      resp = urllib2.urlopen(req)
+      resp = urllib.request.urlopen(req, context=ctx)
 
       if auth_scope == "unscoped":
-        self.user_auth_token = resp.info().getheader('X-Subject-Token')
+        self.user_auth_token = resp.headers['X-Subject-Token']
 
-    except urllib2.HTTPError as e:
+    except urllib.error.HTTPError as e:
       logger.log(logging.CRITICAL, "Error @ line %s", str(sys.exc_info()[2].tb_lineno))
       if hasattr(e, 'reason'):
         logger.log(logging.ERROR, "Failed to connect to endpoint: %s...", url)
@@ -86,19 +98,25 @@ class OpenStackAuth:
   def os_request(self, url, token, ssl_verify=False):
     logger.log(logging.DEBUG, "make REST API request -- url:  %s", url)
     logger.log(logging.DEBUG, "token:  %s", token)
+
+    ctx = ssl.create_default_context()
+    if not ssl_verify:
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+
     headers = {
       "Content-Type": "application/json",
       "X-Auth-Token": token
     }
 
     try:
-      req = urllib2.Request(
+      req = urllib.request.Request(
         url,
         headers=headers,
       )
-      resp = urllib2.urlopen(req)
+      resp = urllib.request.urlopen(req, timeout=60, context=ctx)
 
-    except urllib2.HTTPError as e:
+    except urllib.error.HTTPError as e:
       logger.log(logging.CRITICAL, "Error @ line %s", str(sys.exc_info()[2].tb_lineno))
       if hasattr(e, 'reason'):
         logger.log(logging.ERROR, "Failed to connect to endpoint: %s...", url)
@@ -118,7 +136,7 @@ class OpenStackAuth:
 
     for alias in self.service_types[service_type]:
       # O(M*N) gross I know
-      for k, v in catalog.items():
+      for k, v in list(catalog.items()):
         if v["type"] == alias:
           logger.log(logging.DEBUG, "Found catalog service %s for service type %s using alias %s", k, service_type, alias)
           return v
@@ -213,8 +231,9 @@ class OpenStackAuth:
   def getProjectAuth(self, config, project, os_user_auth_token):
     identity = self.getIdentity("project", os_user_auth_token)
     auth_scope = self.getAuthScope(project)
+    ssl_verify = config["ssl_verify"]
     keystone_token_url = osutils.getKeystoneTokensUrl(config)
-    resp = self.getAuthToken(keystone_token_url, auth_scope, identity) # project-scoped
+    resp = self.getAuthToken(keystone_token_url, auth_scope, identity, ssl_verify) # project-scoped
     if not resp: #type(resp) == urllib2.HTTPError:
       sys.exit("Unable to obtain project token. Terminating the process\n")
 
@@ -226,4 +245,3 @@ class OpenStackAuth:
     project["catalog"] =  self.setServiceEndpoints(config, project["name"], respJson.get("token").get("catalog"))
 
     self.last_project = project
-
