@@ -2,7 +2,7 @@ import sys
 import re
 import json
 import logging
-import osutils
+from . import osutils
 
 
 logger = logging.getLogger("nr.os.mon.metrics")
@@ -48,38 +48,41 @@ class ProcessMetrics:
     token = project["auth_token"]
     svc = "compute"
     endpoint = "/servers"
-    resp = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token)
+    ssl_verify = self.os_auth.ssl_verify
+    resp = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token, ssl_verify)
     if not resp:
       logger.log(logging.WARNING, "skipping server metrics collection - could not find valid compute endpoint")
       return
 
     endpoint = "/servers/detail"
-    servers_details = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token)
+    servers_details = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token, ssl_verify)
 
-    for server in resp.get("servers"):
-      logger.log(logging.DEBUG, "server id: %s --- server name: %s", server.get("id"), server.get("name"))
-      endpoint = "/servers/{0}/diagnostics".format(server.get("id"))
-      resp = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token)
-      if not resp:
-        logger.log(logging.WARNING, "skipping server metrics collection for server %s (%s) - could not find valid compute endpoint", server.get("id"), server.get("name"))
-        return
-      resp['id'] = server.get("id")
-      resp['name'] = server.get("name")
-      resp['hypervisor_name'] = self.getHypervisorName(servers_details['servers'], resp['id'])
+    for server in servers_details.get("servers"):
+      logger.log(logging.DEBUG, "server name: %s --- server status: %s", server.get("name"), server.get("status"))
+      if server.get("status") == 'ACTIVE':
+        logger.log(logging.DEBUG, "server id: %s --- server name: %s", server.get("id"), server.get("name"))
+        endpoint = "/servers/{0}/diagnostics".format(server.get("id"))
+        resp = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token, ssl_verify)
+        if not resp:
+          logger.log(logging.WARNING, "skipping server metrics collection for server %s (%s) - could not find valid compute endpoint", server.get("id"), server.get("name"))
+          return
+        resp['id'] = server.get("id")
+        resp['name'] = server.get("name")
+        resp['hypervisor_name'] = self.getHypervisorName(servers_details['servers'], resp['id'])
 
-      keys = resp.keys()
-      for key in keys:
-        match = re.match('^.*_([rt]x.*)$', key)
-        if match:
-          resp[match.group(1)] = resp[key]
-          del resp[key]
+        keys = list(resp.keys())
+        for key in keys:
+          match = re.match('^.*_([rt]x.*)$', key)
+          if match:
+            resp[match.group(1)] = resp[key]
+            del resp[key]
 
-      metrics = '{"server": ' + json.dumps(resp) + ' }'
+        metrics = '{"server": ' + json.dumps(resp) + ' }'
 
-      self.write_result(
-        self.file_handles["servers"], 
-        self.constructInsightsEvent("servers", "project", metrics)
-      )
+        self.write_result(
+          self.file_handles["servers"],
+          self.constructInsightsEvent("servers", "project", metrics)
+        )
 
 
   # ----------------------------------------
@@ -87,8 +90,9 @@ class ProcessMetrics:
     # get "project"  limits
     token = project["auth_token"]
     svc = "compute"
+    ssl_verify = self.os_auth.ssl_verify
     endpoint = "/limits"
-    resp = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token)
+    resp = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token, ssl_verify)
     if not resp:
       logger.log(logging.WARNING, "skipping project limits collection - could not find valid compute endpoint")
       return
@@ -96,7 +100,7 @@ class ProcessMetrics:
     metrics = '{"limits": ' + json.dumps(resp['limits']['absolute']) + ' }'
 
     self.write_result(
-      self.file_handles["limits"], 
+      self.file_handles["limits"],
       self.constructInsightsEvent("limits", "project", metrics)
     )
 
@@ -108,15 +112,16 @@ class ProcessMetrics:
     # get limits for block storage (cinder)
     token = project["auth_token"]
     svc = "block-storage"
+    ssl_verify = self.os_auth.ssl_verify
     endpoint = "/limits"
 
-    cinder_limits = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token)
+    cinder_limits = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token, ssl_verify)
     if not cinder_limits:
       logger.log(logging.WARNING, "skipping block storage limits collection - could not find valid block_storage endpoint")
       return
     # get snapshot metrics for block storage (cinder)
     endpoint = "/snapshots"
-    cinder_snapshots = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token)
+    cinder_snapshots = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token, ssl_verify)
     if not cinder_snapshots:
       logger.log(logging.WARNING, "skipping block storage snapshots collection - could not find valid block_storage endpoint")
       return
@@ -126,7 +131,7 @@ class ProcessMetrics:
       size = size + snapshot['size']
     # get volume metrics for block storage (cinder)
     endpoint = "/volumes/detail"
-    cinder_volumes = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token)
+    cinder_volumes = self.os_auth.iterate_endpoint_interfaces(project["catalog"], svc, endpoint, token, ssl_verify)
     if not cinder_volumes:
       logger.log(logging.WARNING, "skipping block storage volumes collection - could not find valid block_storage endpoint")
       return
@@ -140,7 +145,7 @@ class ProcessMetrics:
         ', "volumes": { "count": ' + str(volumes_length) + ', "size": ' + str(size) + ' } }'
 
     self.write_result(
-      self.file_handles["block_storage"], 
+      self.file_handles["block_storage"],
       self.constructInsightsEvent("block_storage", "project", metrics)
     )
 
@@ -151,9 +156,10 @@ class ProcessMetrics:
     # get list of hypervisors
     token = service["auth_token"]
     svc = "compute"
+    ssl_verify = self.os_auth.ssl_verify
     endpoint = "/os-hypervisors"
 
-    resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+    resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
     if not resp:
       logger.log(logging.WARNING, "skipping hypervisor collection - could not find valid compute endpoint")
       return
@@ -162,7 +168,7 @@ class ProcessMetrics:
       logger.log(logging.DEBUG, "hypervisor id: %s", hypervisor.get("id"))
       # collect metrics for hypervisors
       endpoint = "/os-hypervisors/{0}".format(hypervisor.get("id"))
-      hypervisor_metrics = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+      hypervisor_metrics = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
       if not hypervisor_metrics:
         logger.log(logging.WARNING, "skipping hypervisor metrics collection - could not find valid compute endpoint")
         return
@@ -170,7 +176,7 @@ class ProcessMetrics:
 
       # get uptime
       endpoint = "{0}/uptime".format(endpoint)
-      hypervisor_uptime = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+      hypervisor_uptime = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
       if not hypervisor_uptime:
         logger.log(logging.WARNING, "skipping hypervisor uptime collection - could not find valid compute endpoint")
       else:
@@ -210,7 +216,7 @@ class ProcessMetrics:
       metrics = json.dumps(hypervisor_metrics)
 
       self.write_result(
-        self.file_handles["hypervisors"], 
+        self.file_handles["hypervisors"],
         self.constructInsightsEvent("hypervisors", "system", metrics)
       )
 
@@ -220,8 +226,9 @@ class ProcessMetrics:
     # get count for resources: "routers", "subnets", "floatingips", "security-groups"
     token = service["auth_token"]
     svc = "network"
+    ssl_verify = self.os_auth.ssl_verify
     endpoint = "/{0}/{1}".format(service["neutron_api_version"], resource)
-    resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+    resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
     if not resp:
       logger.log(logging.WARNING, "skipping network resource count collection - could not find valid network endpoint")
       return
@@ -237,8 +244,9 @@ class ProcessMetrics:
     # get list of networks
     token = service["auth_token"]
     svc = "network"
+    ssl_verify = self.os_auth.ssl_verify
     endpoint = "/{0}/networks".format(service["neutron_api_version"])
-    resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+    resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
     if not resp:
       logger.log(logging.WARNING, "skipping network collection - could not find valid network endpoint")
       return
@@ -246,7 +254,7 @@ class ProcessMetrics:
     for network in resp.get("networks"):
       logger.log(logging.DEBUG, "processing network id: %s --- network name: %s", network.get("id"), network.get("name"))
       endpoint = "/{0}/networks/{1}".format(service["neutron_api_version"], network.get("id"))
-      network_metrics = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+      network_metrics = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
       if not resp:
         logger.log(logging.WARNING, "skipping network metrics collection - could not find valid network endpoint")
         return
@@ -269,9 +277,10 @@ class ProcessMetrics:
 
     token = service["auth_token"]
     svc = "image"
+    ssl_verify = self.os_auth.ssl_verify
     endpoint = "/{0}/images".format(self.config["glance_api_version"])
 
-    resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+    resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
     if not resp:
       logger.log(logging.WARNING, "skipping image metrics collection - could not find valid image endpoint")
       return
@@ -290,9 +299,10 @@ class ProcessMetrics:
     # service_type = "placement"
     token = service["auth_token"]
     svc = "placement"
+    ssl_verify = self.os_auth.ssl_verify
     endpoint = "/resource_providers"
 
-    resource_providers = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+    resource_providers = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
     if not resource_providers:
       logger.log(logging.WARNING, "skipping placement collection - could not find valid placement endpoint")
       return
@@ -300,14 +310,14 @@ class ProcessMetrics:
     for resource_provider in resource_providers.get("resource_providers"):
       logger.log(logging.DEBUG, ">> resource provider: %s", json.dumps(resource_provider, sort_keys=True, indent=2, separators=(',', ': ')))
       endpoint = "/resource_providers/{0}/inventories".format(resource_provider["uuid"])
-      inventory_resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+      inventory_resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
       if not inventory_resp:
         logger.log(logging.WARNING, "skipping placement inventory collection - could not find valid placement endpoint")
         return
       logger.log(logging.DEBUG, ">> respource provider inventories: %s", json.dumps(inventory_resp, sort_keys=True, indent=2, separators=(',', ': ')))
 
       endpoint = "/resource_providers/{0}/usages".format(resource_provider["uuid"])
-      usage_resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token)
+      usage_resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], svc, endpoint, token, ssl_verify)
       if not usage_resp:
         logger.log(logging.WARNING, "skipping placement usages collection - could not find valid placement endpoint")
         return
@@ -331,14 +341,14 @@ class ProcessMetrics:
     def traverseEvent(ev, key="", isList=False):
 
       if type(ev) is dict:
-        for k, v in ev.items():
+        for k, v in list(ev.items()):
           traverseEvent(v, key+k+".", isList)
-        
+
       elif type(ev) is list:
           c = 0
           isList = True
-          for el in ev:                 
-            traverseEvent(el, key[:-1]+"_"+str(c)+".", isList) 
+          for el in ev:
+            traverseEvent(el, key[:-1]+"_"+str(c)+".", isList)
             c += 1
       else:
         element = "openstack.{0}.{1}".format(component_name, key[:-1])
@@ -360,7 +370,7 @@ class ProcessMetrics:
     if resource == "project":
       event["openstack.project.id"] = self.current_project["id"]
       event["openstack.project.name"] = self.current_project["name"]
-    
+
     return json.dumps(event)
 
 
@@ -369,13 +379,14 @@ class ProcessMetrics:
 
     resource_metrics = {}
     token = service["auth_token"]
+    ssl_verify = self.os_auth.ssl_verify
     for ep in endpoints:
 
       resp = None
-      if service_type == "identity":
-        ep = "/{0}{1}".format(self.config["keystone_api_version"], ep)
+#      if service_type == "identity":
+#        ep = "/{0}{1}".format(self.config["keystone_api_version"], ep)
       try:
-        resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], service_type, ep, token)
+        resp = self.os_auth.iterate_endpoint_interfaces(service["catalog"], service_type, ep, token, ssl_verify)
         if not resp:
           logger.log(logging.WARNING, "skipping system counts collection - could not find valid %s endpoint", service_type)
           return
@@ -475,17 +486,18 @@ class ProcessMetrics:
   def getProjectMetrics(self):
     # get user token
     identity = self.os_auth.getIdentity("user") # get auth for user
+    ssl_verify = self.os_auth.ssl_verify
     auth_scope = "unscoped"
     keystone_token_url = osutils.getKeystoneTokensUrl(self.config)
-    resp = self.os_auth.getAuthToken(keystone_token_url, auth_scope, identity) # unscoped
+    resp = self.os_auth.getAuthToken(keystone_token_url, auth_scope, identity, ssl_verify) # unscoped
     if not resp:
       sys.exit("Unable to obtain user token. Terminating the process\n")
 
-    os_user_auth_token = resp.info().getheader('X-Subject-Token')
+    os_user_auth_token = resp.headers['X-Subject-Token']
 
     # # get project list
     keystone_project_url = osutils.getKeystoneProjectsUrl(self.config)
-    resp = self.os_auth.os_request(keystone_project_url, os_user_auth_token)
+    resp = self.os_auth.os_request(keystone_project_url, os_user_auth_token, ssl_verify)
     logger.log(logging.DEBUG, ">>>> PROJECTS: %s", json.dumps(resp.get("projects"), sort_keys=True, indent=2, separators=(',', ': ')))
 
 
@@ -509,4 +521,3 @@ class ProcessMetrics:
       if (self.service_type == "all" or self.service_type == "block_storage") and self.config["service_types"]["block_storage"]["enabled"]:
         logger.log(logging.INFO, ">>> collecting block storage limits for project %s", project["name"])
         self.getBlockStorageMetrics(project)
-

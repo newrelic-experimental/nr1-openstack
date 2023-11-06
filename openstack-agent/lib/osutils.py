@@ -1,7 +1,7 @@
 import sys
 import os
 import re
-import urlparse
+import urllib.parse
 import logging
 import logging.config
 from logging.handlers import TimedRotatingFileHandler
@@ -50,12 +50,12 @@ def updateUrlApiVersion(config, url, os_service=None):
   # update url api version for service:interface if specified in config
   svc_api_version_property_name = "{0}_api_version".format(os_service)
   if svc_api_version_property_name in config:
-    parsed_url = list(urlparse.urlparse(url))
+    parsed_url = list(urllib.parse.urlparse(url))
     if len(parsed_url[2]):
       regex = "(\\/)([vV]{1}[0-9]+)(\\.?[0-9]*)(\\/|$)"
       repl = "\\1{0}\\4".format(config[svc_api_version_property_name])
       parsed_url[2] = re.sub(regex, repl, parsed_url[2])
-      url = urlparse.urlunparse(parsed_url)
+      url = urllib.parse.urlunparse(parsed_url)
 
   return getOsUrl(config, url)
 
@@ -64,14 +64,14 @@ def getOsUrl(config, url):
   if "alternate_host" not in config:
     return url
 
-  parsed_url = list(urlparse.urlparse(url))
+  parsed_url = list(urllib.parse.urlparse(url))
   if parsed_url[1]:
     split = parsed_url[1].split(':')
     if len(split) == 1:
       parsed_url[1] = config['alternate_host']
     else:
       parsed_url[1] = config['alternate_host'] + ':' + split[1]
-    return urlparse.urlunparse(parsed_url)
+    return urllib.parse.urlunparse(parsed_url)
 
   return url
 
@@ -86,5 +86,3 @@ def getKeystoneProjectsUrl(config):
     config,
     config["keystone_url"] + "/" + config["keystone_api_version"] + "/auth/projects",
   )
-
-
